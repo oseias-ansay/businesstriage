@@ -28,11 +28,15 @@ export const SERVICES: Service[] = [
     icon: FileText,
     title: 'Diagnóstico Financeiro & DRE Empresarial',
     desc: 'Análise completa da saúde financeira com base na Demonstração de Resultado do Exercício.',
+    action: 'diagnostico-financeiro',
+    cta: 'Fazer diagnóstico gratuito',
   },
   {
     icon: TrendingUp,
     title: 'Diagnóstico Comercial & Funil de Vendas',
     desc: 'Mapeamento do funil comercial para identificar gargalos e oportunidades de conversão.',
+    action: 'diagnostico-comercial',
+    cta: 'Fazer diagnóstico gratuito',
   },
   {
     icon: Wallet,
@@ -49,10 +53,17 @@ export const SERVICES: Service[] = [
 export const TOOLS: Tool[] = [
   {
     id: 'diag',
-    module: 'Financeiro',
+    module: 'Diagnósticos',
     icon: Activity,
     title: 'Diagnóstico Financeiro',
     desc: 'Avaliação completa da saúde financeira da empresa.',
+  },
+  {
+    id: 'diagComercial',
+    module: 'Diagnósticos',
+    icon: TrendingUp,
+    title: 'Diagnóstico Comercial',
+    desc: 'Maturidade do funil, geração de demanda, equipe e pós-venda.',
   },
   {
     id: 'cg',
@@ -105,6 +116,7 @@ export const TOOLS: Tool[] = [
   },
 ];
 
+export const DIAG_TOOLS = TOOLS.filter((t) => t.module === 'Diagnósticos');
 export const FIN_TOOLS = TOOLS.filter((t) => t.module === 'Financeiro');
 export const TRAF_TOOLS = TOOLS.filter((t) => t.module === 'Tráfego');
 

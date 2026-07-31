@@ -1,4 +1,5 @@
 import { CapitalDeGiro, DiagnosticoFinanceiro, MargemContribuicao } from './FinanceTools';
+import { DiagnosticoComercial } from './CommercialTools';
 import {
   AnaliseGoogleAds,
   AnaliseMetaAds,
@@ -13,6 +14,7 @@ const REGISTRY: Record<ToolId, FC> = {
   diag: DiagnosticoFinanceiro,
   cg: CapitalDeGiro,
   mc: MargemContribuicao,
+  diagComercial: DiagnosticoComercial,
   creatives: ProducaoCriativos,
   metaCreate: CampanhaMetaAds,
   googleCreate: CampanhaGoogleAds,

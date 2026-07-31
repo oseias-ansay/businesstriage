@@ -1,34 +1,42 @@
 import { useState } from 'react';
-import { Stat } from '../components/ui';
 import { fmt } from '../data/content';
+import DiagnosticoFinanceiroModal from '../components/DiagnosticoFinanceiroModal';
 
-/** Diagnóstico Financeiro — gera os indicadores consolidados. */
+const ENTREGAS_FINANCEIRO = [
+  'Score financeiro de 0 a 100, com os quatro pilares detalhados',
+  'Margem de contribuição, ponto de equilíbrio e margem de segurança',
+  'Ciclo financeiro, NCG e cobertura de caixa em dias',
+  'Endividamento, custo dos juros e comprometimento da receita',
+  'Plano de ação priorizado por impacto',
+];
+
+/** Diagnóstico Financeiro — coleta os dados e dispara a análise. */
 export function DiagnosticoFinanceiro() {
-  const [generated, setGenerated] = useState(false);
+  const [aberto, setAberto] = useState(false);
 
   return (
     <div>
-      <p className="m-0 mb-5 text-sm leading-relaxed text-slate-600">
-        Com base nos dados financeiros da sua empresa, geramos um raio-x completo com indicadores de
-        liquidez, rentabilidade e endividamento.
+      <p className="m-0 mb-4 text-sm leading-relaxed text-slate-600">
+        Preencha os dados do último mês fechado. A análise é gerada a partir dos números que você
+        informar e o relatório completo chega no seu e-mail em até 24 horas úteis.
       </p>
 
-      <button
-        type="button"
-        onClick={() => setGenerated(true)}
-        className="btn-accent mb-6 px-[22px] py-3"
-      >
-        Gerar Diagnóstico
+      <ul className="m-0 mb-6 list-none space-y-2 p-0">
+        {ENTREGAS_FINANCEIRO.map((item) => (
+          <li key={item} className="flex items-start gap-2 text-sm text-slate-600">
+            <span className="mt-[7px] h-1.5 w-1.5 flex-none rounded-full bg-emerald-500" />
+            {item}
+          </li>
+        ))}
+      </ul>
+
+      <button type="button" onClick={() => setAberto(true)} className="btn-accent px-[22px] py-3">
+        Iniciar diagnóstico
       </button>
 
-      {generated && (
-        <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(180px,1fr))]">
-          <Stat label="LIQUIDEZ CORRENTE" value="1.8x" />
-          <Stat label="MARGEM LÍQUIDA" value="11.4%" />
-          <Stat label="ENDIVIDAMENTO" value="38%" />
-          <Stat label="SCORE GERAL" value="84/100" tone="accent" />
-        </div>
-      )}
+      <p className="m-0 mt-3 text-xs text-slate-400">Leva cerca de 6 minutos.</p>
+
+      <DiagnosticoFinanceiroModal open={aberto} onClose={() => setAberto(false)} />
     </div>
   );
 }

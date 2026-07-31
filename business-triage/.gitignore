@@ -3,5 +3,13 @@ dist
 dist-ssr
 .DS_Store
 *.local
+
+# Variáveis de ambiente.
+# .env.development e .env.production ficam versionados: contêm apenas as URLs
+# dos webhooks, que o Vite embute no bundle publico durante o build — tratá-las
+# como segredo seria inócuo. Só .env e os *.local ficam de fora.
+.env
+.env.local
+.env.*.local
 .vscode/*
 !.vscode/extensions.json

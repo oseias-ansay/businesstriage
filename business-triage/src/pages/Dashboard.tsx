@@ -3,7 +3,7 @@ import { LogOut } from 'lucide-react';
 import { Logo } from '../components/ui';
 import AssistantChat from '../components/AssistantChat';
 import ToolPanel from '../tools/ToolPanel';
-import { FIN_TOOLS, TOOLS, TRAF_TOOLS } from '../data/content';
+import { DIAG_TOOLS, FIN_TOOLS, TOOLS, TRAF_TOOLS } from '../data/content';
 import type { Tool, ToolId } from '../types';
 
 const CLIENT = { name: 'Empresa Modelo Ltda.', initials: 'EM' };
@@ -104,6 +104,7 @@ export default function Dashboard({ onLogout }: DashboardProps) {
             <AssistantChat />
 
             <div className="flex flex-col gap-7">
+              <ToolGroup title="Relatórios de Diagnósticos" tools={DIAG_TOOLS} onOpen={open} />
               <ToolGroup title="Módulo Financeiro" tools={FIN_TOOLS} onOpen={open} />
               <ToolGroup
                 title="Módulo de Tráfego & Marketing Digital"
