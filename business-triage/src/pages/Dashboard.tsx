@@ -1,16 +1,12 @@
 import { useState } from 'react';
-import { LogOut } from 'lucide-react';
-import { Logo } from '../components/ui';
+import { useNavigate } from 'react-router-dom';
+import { AlertCircle, ArrowRight, LineChart } from 'lucide-react';
 import AssistantChat from '../components/AssistantChat';
 import ToolPanel from '../tools/ToolPanel';
 import { DIAG_TOOLS, FIN_TOOLS, TOOLS, TRAF_TOOLS } from '../data/content';
+import { useAuth } from '../contexts/AuthContext';
+import { useTenant } from '../contexts/TenantContext';
 import type { Tool, ToolId } from '../types';
-
-const CLIENT = { name: 'Empresa Modelo Ltda.', initials: 'EM' };
-
-interface DashboardProps {
-  onLogout: () => void;
-}
 
 function ToolCard({ tool, onOpen }: { tool: Tool; onOpen: (id: ToolId) => void }) {
   const Icon = tool.icon;
@@ -52,7 +48,38 @@ function ToolGroup({
   );
 }
 
-export default function Dashboard({ onLogout }: DashboardProps) {
+/**
+ * Chamada do módulo financeiro.
+ *
+ * Recebe destaque próprio em vez de virar mais um card na grade: as demais
+ * ferramentas são calculadoras de uso pontual; esta é a que o cliente abre
+ * todo dia. Tratar as duas coisas como iguais esconderia o produto principal.
+ */
+function CardFinanceiro({ onOpen }: { onOpen: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="group mb-7 flex w-full cursor-pointer items-center gap-4 rounded-2xl border border-navy-800 bg-navy-900 p-6 text-left transition-colors hover:bg-navy-800"
+    >
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500">
+        <LineChart className="h-6 w-6 text-navy-ink" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="text-base font-extrabold text-white">Controle Financeiro</div>
+        <div className="mt-0.5 text-[13px] text-slate-300">
+          Contas a pagar e receber, fluxo de caixa projetado e DRE gerencial.
+        </div>
+      </div>
+      <ArrowRight className="h-5 w-5 shrink-0 text-emerald-500 transition-transform group-hover:translate-x-1" />
+    </button>
+  );
+}
+
+export default function Dashboard() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { current, tenants, loading, error } = useTenant();
   const [activeTool, setActiveTool] = useState<ToolId | null>(null);
 
   const open = (id: ToolId) => {
@@ -67,54 +94,48 @@ export default function Dashboard({ onLogout }: DashboardProps) {
 
   const tool = TOOLS.find((t) => t.id === activeTool) ?? null;
 
+  if (tool) return <ToolPanel tool={tool} onBack={close} />;
+
   return (
-    <div className="min-h-screen bg-slate-100">
-      <header className="flex h-[68px] items-center justify-between bg-navy-900 px-6">
-        <Logo size="sm" />
-        <div className="flex items-center gap-[18px]">
-          <div className="flex items-center gap-2 text-[13px] text-slate-300">
-            <div className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-emerald-500 text-[13px] font-bold text-navy-ink">
-              {CLIENT.initials}
-            </div>
-            <span className="hidden sm:inline">{CLIENT.name}</span>
-          </div>
-          <button
-            type="button"
-            onClick={onLogout}
-            className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-white/[0.08] px-3.5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-white/[0.16]"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-            Sair
-          </button>
-        </div>
-      </header>
+    <div>
+      <div className="mb-8">
+        <h1 className="m-0 mb-1 text-2xl font-extrabold text-navy-900">Painel do Cliente</h1>
+        <p className="m-0 text-sm text-slate-500">
+          Acesse suas ferramentas de diagnóstico e performance.
+        </p>
+      </div>
 
-      <main className="mx-auto max-w-[1180px] px-6 pb-20 pt-9">
-        {tool ? (
-          <ToolPanel tool={tool} onBack={close} />
-        ) : (
+      {/* Autenticado mas sem vínculo: estado real, precisa de aviso claro. */}
+      {!loading && tenants.length === 0 && (
+        <div className="mb-7 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <AlertCircle className="mt-px h-5 w-5 shrink-0 text-amber-600" />
           <div>
-            <div className="mb-8">
-              <h1 className="m-0 mb-1 text-2xl font-extrabold text-navy-900">Painel do Cliente</h1>
-              <p className="m-0 text-sm text-slate-500">
-                Acesse suas ferramentas de diagnóstico e performance.
-              </p>
+            <div className="text-sm font-bold text-amber-900">
+              Sua conta ainda não está vinculada a uma empresa
             </div>
-
-            <AssistantChat />
-
-            <div className="flex flex-col gap-7">
-              <ToolGroup title="Relatórios de Diagnósticos" tools={DIAG_TOOLS} onOpen={open} />
-              <ToolGroup title="Módulo Financeiro" tools={FIN_TOOLS} onOpen={open} />
-              <ToolGroup
-                title="Módulo de Tráfego & Marketing Digital"
-                tools={TRAF_TOOLS}
-                onOpen={open}
-              />
+            <div className="mt-0.5 text-[13px] text-amber-800">
+              Entre em contato com a Business Triage para liberar seu acesso
+              {user?.email ? ` (${user.email})` : ''}.
             </div>
           </div>
-        )}
-      </main>
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-7 rounded-xl border border-red-200 bg-red-50 p-4 text-[13px] text-red-700">
+          {error}
+        </div>
+      )}
+
+      {current && <CardFinanceiro onOpen={() => navigate('financeiro')} />}
+
+      <AssistantChat />
+
+      <div className="flex flex-col gap-7">
+        <ToolGroup title="Relatórios de Diagnósticos" tools={DIAG_TOOLS} onOpen={open} />
+        <ToolGroup title="Módulo Financeiro" tools={FIN_TOOLS} onOpen={open} />
+        <ToolGroup title="Módulo de Tráfego & Marketing Digital" tools={TRAF_TOOLS} onOpen={open} />
+      </div>
     </div>
   );
 }

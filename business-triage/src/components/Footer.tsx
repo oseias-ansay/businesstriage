@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { AtSign, Globe, MessageSquare } from 'lucide-react';
 import { Logo } from './ui';
 import { SITE } from '../data/content';
@@ -30,7 +31,13 @@ export default function Footer() {
         <span>
           © {new Date().getFullYear()} {SITE.name}. Todos os direitos reservados.
         </span>
-        <span>CNPJ {SITE.cnpj} · Termos de Uso · Política de Privacidade</span>
+        <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+          <span>CNPJ {SITE.cnpj}</span>
+          <span aria-hidden="true">·</span>
+          <Link to="/privacidade" className="underline-offset-2 transition-colors hover:text-white hover:underline">
+            Privacidade e Confidencialidade
+          </Link>
+        </span>
       </div>
     </footer>
   );

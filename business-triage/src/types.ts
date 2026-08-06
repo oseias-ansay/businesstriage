@@ -1,5 +1,9 @@
 import type { LucideIcon } from 'lucide-react';
 
+/**
+ * @deprecated A navegação passou a ser por rotas (react-router-dom).
+ * Mantido só para não quebrar imports antigos; remova quando não houver mais uso.
+ */
 export type View = 'public' | 'login' | 'dashboard';
 
 export type ToolId =

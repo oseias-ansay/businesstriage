@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Target, X, Check, ArrowRight, ArrowLeft, ChevronDown, Loader2, AlertCircle } from 'lucide-react';
+import { TERMO_PRIVACIDADE } from '../data/content';
 import type { ChangeEvent, FormEvent, ReactNode } from 'react';
 
 const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_COMERCIAL ?? '';
@@ -203,6 +204,12 @@ export interface EmpresaPrefill {
 
 export interface PayloadDiagnosticoComercial {
   meta: Record<string, unknown>;
+  consentimento: {
+    aceito: true;
+    termo_versao: string;
+    termo_atualizado_em: string;
+    aceito_em: string;
+  };
   identificacao: Record<string, unknown>;
   comercial: Record<string, unknown>;
 }
@@ -395,6 +402,8 @@ export default function DiagnosticoComercialModal({
   const [erros, setErros] = useState<Erros>({});
   const [enviando, setEnviando] = useState(false);
   const [erroEnvio, setErroEnvio] = useState('');
+  const [aceite, setAceite] = useState(false);
+  const [erroAceite, setErroAceite] = useState('');
   const [sucesso, setSucesso] = useState<{ protocolo: string; email: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -413,6 +422,8 @@ export default function DiagnosticoComercialModal({
     setEtapa(1);
     setErros({});
     setErroEnvio('');
+    setAceite(false);
+    setErroAceite('');
     setSucesso(null);
   }, [open, empresa]);
 
@@ -496,6 +507,12 @@ export default function DiagnosticoComercialModal({
         pagina: window.location.href,
         user_agent: navigator.userAgent,
       },
+      consentimento: {
+        aceito: true,
+        termo_versao: TERMO_PRIVACIDADE.versao,
+        termo_atualizado_em: TERMO_PRIVACIDADE.atualizadoEm,
+        aceito_em: new Date().toISOString(),
+      },
       identificacao: {
         razao_social: form.razao_social.trim(),
         cnpj: digits(form.cnpj),
@@ -530,6 +547,10 @@ export default function DiagnosticoComercialModal({
     e.preventDefault();
     if (!validar(OBRIGATORIOS_ETAPA_1, true)) { setEtapa(1); return; }
     if (!validar(OBRIGATORIOS_ETAPA_2, false)) return;
+    if (!aceite) {
+      setErroAceite('É necessário aceitar o Termo de Privacidade e Confidencialidade para enviar.');
+      return;
+    }
     if (!webhookUrl) {
       setErroEnvio('Webhook não configurado. Defina VITE_N8N_WEBHOOK_COMERCIAL no ambiente.');
       return;
@@ -844,6 +865,49 @@ export default function DiagnosticoComercialModal({
                     </div>
                   </section>
                 </>
+              )}
+
+              {etapa === 2 && (
+                <div className="mt-7 border-t border-white/10 pt-5">
+                  <label
+                    className={`flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3.5 transition ${
+                      aceite
+                        ? 'border-emerald-500 bg-emerald-500/[0.12]'
+                        : erroAceite
+                        ? 'border-red-400 bg-white/[0.04]'
+                        : 'border-white/[0.13] bg-white/[0.04] hover:border-emerald-500/[0.45]'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={aceite}
+                      onChange={(e) => {
+                        setAceite(e.target.checked);
+                        if (e.target.checked) setErroAceite('');
+                      }}
+                      className="mt-0.5 h-4 w-4 flex-none rounded accent-emerald-500"
+                    />
+                    <span className="text-[13.5px] leading-relaxed text-slate-200">
+                      Li e concordo com o{' '}
+                      <a
+                        href="/privacidade"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-semibold text-emerald-400 underline underline-offset-2"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Termo de Privacidade e Confidencialidade
+                      </a>
+                      . Autorizo o uso dos dados informados para a geração do meu diagnóstico.
+                    </span>
+                  </label>
+                  {erroAceite && (
+                    <p className="mt-1.5 flex items-center gap-1 text-xs text-red-400">
+                      <AlertCircle className="h-3.5 w-3.5 flex-none" />
+                      {erroAceite}
+                    </p>
+                  )}
+                </div>
               )}
 
               {erroEnvio && (

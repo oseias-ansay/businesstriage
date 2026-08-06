@@ -20,7 +20,19 @@ export const SITE = {
   email: 'contato@businesstriage.com.br',
   location: 'Curitiba, PR — Atendimento em todo o Brasil',
   whatsapp: 'https://wa.me/5541991777268',
-  cnpj: '00.000.000/0001-00',
+  cnpj: '32.923.569/0001-15',
+} as const;
+
+/**
+ * Versão do Termo de Privacidade e Confidencialidade.
+ *
+ * É gravada junto com o aceite de cada diagnóstico. Ao alterar o texto do
+ * termo de forma relevante, incremente a versão e atualize a data — assim o
+ * registro de consentimento diz a qual redação o cliente concordou.
+ */
+export const TERMO_PRIVACIDADE = {
+  versao: '1.0',
+  atualizadoEm: '2026-07-31',
 } as const;
 
 export const SERVICES: Service[] = [
